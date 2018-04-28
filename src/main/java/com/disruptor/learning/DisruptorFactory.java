@@ -80,7 +80,8 @@ public class DisruptorFactory<T> {
      * @Version1.0 2018年4月17日 下午5:07:49 by 代鹏（daipeng.456@gmail.com）创建
      * @return
      */
-    public Disruptor<DisruptorEvent<T>> getDisruptorInstance(EventHandler<? super DisruptorEvent<T>> handler) {
+    @SuppressWarnings("unchecked")
+    public Disruptor<DisruptorEvent<T>> getDisruptorInstance(EventHandler<? super DisruptorEvent<T>>... handlers) {
         if (null == disruptor) {
             disruptor = new Disruptor<DisruptorEvent<T>>(DisruptorEvent::new, bufferSize, new ThreadFactory() {
                 @Override
@@ -88,7 +89,7 @@ public class DisruptorFactory<T> {
                     return new Thread(r, threadName);
                 }
             }, producerType, waitStrategy);
-            disruptor.handleEventsWith(handler);
+            disruptor.handleEventsWith(handlers);
             disruptor.start();
         }
         return disruptor;
