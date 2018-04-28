@@ -17,7 +17,8 @@ public class TestHandler {
     }
     
     public boolean process(DisruptorEvent<?> event){
-        return tracer.count();
+        boolean ret = tracer.count();
+        return ret;
     }
 
 }

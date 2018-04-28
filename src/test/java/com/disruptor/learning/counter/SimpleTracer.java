@@ -1,6 +1,7 @@
 package com.disruptor.learning.counter;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Description:简单计数器实现
@@ -13,7 +14,7 @@ public class SimpleTracer implements CounterTracer {
 
     private long endTicks;
 
-    private long count = 0;
+    private volatile AtomicLong count = new AtomicLong(0);
 
     private boolean end = false;
 
@@ -41,8 +42,8 @@ public class SimpleTracer implements CounterTracer {
         if (end) {
             return end;
         }
-        count++;
-        end = count >= expectedCount;
+        count.incrementAndGet();
+        end = count.get() >= expectedCount;
         if (end) {
             endTicks = System.currentTimeMillis();
             latch.countDown();

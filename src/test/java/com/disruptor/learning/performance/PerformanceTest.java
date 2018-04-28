@@ -1,12 +1,12 @@
-package com.disruptor.learning.press;
+package com.disruptor.learning.performance;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.disruptor.learing.publisher.ArrayBlockingQueueEventPublisher;
 import com.disruptor.learing.publisher.DisruptorEventPublisher;
-import com.disruptor.learing.publisher.EventPublisher;
 import com.disruptor.learning.counter.CounterTracer;
 import com.disruptor.learning.counter.SimpleTracer;
 import com.disruptor.learning.handler.TestHandler;
@@ -19,19 +19,29 @@ import com.disruptor.learning.handler.TestHandler;
 public class PerformanceTest {
     
     private static final long loop = 1000000l;
+    
     private CountDownLatch latch = new CountDownLatch(1);
+    
+    private CounterTracer tracer = new SimpleTracer(loop);
+    private TestHandler handler = new TestHandler(tracer);
+    private DisruptorEventPublisher<Object> disPublisher;
+    private ArrayBlockingQueueEventPublisher<Object> arrayPublisher;
+    
+    @Before
+    public void init() {
+        tracer.start();
+        
+        disPublisher = new DisruptorEventPublisher<Object>(8192, handler);
+        disPublisher.start();
+        
+        arrayPublisher = new ArrayBlockingQueueEventPublisher<Object>(1024000, handler);
+        arrayPublisher.start();
+    }
     
     @Test
     public void test_Disruptor() throws InterruptedException {
-        CounterTracer tracer = new SimpleTracer(loop);
-        TestHandler handler = new TestHandler(tracer);
-                
-        EventPublisher<Integer> publisher = new DisruptorEventPublisher<Integer>(1024, handler);
-        publisher.start();
-        tracer.start();
-                
         for (int i = 0; i < loop; i++) {
-            publisher.publish(i);
+            disPublisher.publish(i);
         }
         tracer.waitForReached();
         System.out.println(tracer.getMilliTimeSpan());
@@ -40,19 +50,14 @@ public class PerformanceTest {
     
     @Test
     public void test_ArrayBlockingQueue() throws InterruptedException {
-        CounterTracer tracer = new SimpleTracer(loop);
-        TestHandler handler = new TestHandler(tracer);
-                
-        EventPublisher<Integer> publisher = new ArrayBlockingQueueEventPublisher<Integer>(1000000, handler);
-        publisher.start();
-        tracer.start();
-                
         for (int i = 0; i < loop; i++) {
-            publisher.publish(i);
+            arrayPublisher.publish(i);
         }
         tracer.waitForReached();
         System.out.println(tracer.getMilliTimeSpan());
         latch.await();
     }
+    
+    
 
 }
