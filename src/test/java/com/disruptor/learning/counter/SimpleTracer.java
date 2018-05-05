@@ -18,11 +18,11 @@ public class SimpleTracer implements CounterTracer {
 
     private boolean end = false;
 
-    private final long expectedCount;
+    private volatile AtomicLong expectedCount = new AtomicLong(0);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public SimpleTracer(long expectedCount) {
+    public SimpleTracer(AtomicLong expectedCount) {
         this.expectedCount = expectedCount;
     }
 
@@ -43,7 +43,7 @@ public class SimpleTracer implements CounterTracer {
             return end;
         }
         count.incrementAndGet();
-        end = count.get() >= expectedCount;
+        end = count.get() >= expectedCount.get();
         if (end) {
             endTicks = System.currentTimeMillis();
             latch.countDown();

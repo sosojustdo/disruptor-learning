@@ -54,6 +54,7 @@ public class DisruptorEventPublisher<T> implements EventPublisher<T> {
 
     @Override
     public void start() {
+        System.out.println("Disruptor");
         disruptor.handleEventsWith(handler);
         disruptor.start();
         ringbuffer = disruptor.getRingBuffer();

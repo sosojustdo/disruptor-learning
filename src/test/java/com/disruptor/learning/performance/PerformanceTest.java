@@ -1,6 +1,7 @@
 package com.disruptor.learning.performance;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,11 +19,11 @@ import com.disruptor.learning.handler.TestHandler;
  */
 public class PerformanceTest {
     
-    private static final long loop = 1000000l;
+    private static final long loop = 10000000l;
     
     private CountDownLatch latch = new CountDownLatch(1);
     
-    private CounterTracer tracer = new SimpleTracer(loop);
+    private CounterTracer tracer = new SimpleTracer(new AtomicLong(loop));
     private TestHandler handler = new TestHandler(tracer);
     private DisruptorEventPublisher<Object> disPublisher;
     private ArrayBlockingQueueEventPublisher<Object> arrayPublisher;
@@ -34,7 +35,7 @@ public class PerformanceTest {
         disPublisher = new DisruptorEventPublisher<Object>(8192, handler);
         disPublisher.start();
         
-        arrayPublisher = new ArrayBlockingQueueEventPublisher<Object>(1024000, handler);
+        arrayPublisher = new ArrayBlockingQueueEventPublisher<Object>(102400000, handler);
         arrayPublisher.start();
     }
     

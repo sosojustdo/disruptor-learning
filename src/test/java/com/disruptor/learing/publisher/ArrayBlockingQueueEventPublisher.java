@@ -16,14 +16,15 @@ public class ArrayBlockingQueueEventPublisher<T> implements EventPublisher<T> {
     private ArrayBlockingQueue<DisruptorEvent<T>> queue;
 
     private TestHandler handler;
-
+    
     public ArrayBlockingQueueEventPublisher(int maxEventSize, TestHandler handler) {
         this.queue = new ArrayBlockingQueue<DisruptorEvent<T>>(maxEventSize);
         this.handler = handler;
     }
-    
+
     @Override
     public void start() {
+        System.out.println("ArrayBlockingQueue");
         Thread thrd = new Thread(new Runnable() {
             @Override
             public void run() {
