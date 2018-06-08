@@ -83,14 +83,18 @@ public class DisruptorFactory<T> {
     @SuppressWarnings("unchecked")
     public Disruptor<DisruptorEvent<T>> getDisruptorInstance(EventHandler<? super DisruptorEvent<T>>... handlers) {
         if (null == disruptor) {
-            disruptor = new Disruptor<DisruptorEvent<T>>(DisruptorEvent::new, bufferSize, new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, threadName);
+            synchronized (this) {
+                if(null == disruptor) {
+                    disruptor = new Disruptor<DisruptorEvent<T>>(DisruptorEvent::new, bufferSize, new ThreadFactory() {
+                        @Override
+                        public Thread newThread(Runnable r) {
+                            return new Thread(r, threadName);
+                        }
+                    }, producerType, waitStrategy);
+                    disruptor.handleEventsWith(handler);
+                    disruptor.start();
                 }
-            }, producerType, waitStrategy);
-            disruptor.handleEventsWith(handlers);
-            disruptor.start();
+            }
         }
         return disruptor;
     }
