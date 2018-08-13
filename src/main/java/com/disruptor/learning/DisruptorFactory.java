@@ -91,7 +91,7 @@ public class DisruptorFactory<T> {
                             return new Thread(r, threadName);
                         }
                     }, producerType, waitStrategy);
-                    disruptor.handleEventsWith(handler);
+                    disruptor.handleEventsWith(handlers);
                     disruptor.start();
                 }
             }

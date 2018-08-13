@@ -20,7 +20,7 @@ import com.disruptor.learning.handler.TestHandler;
 public class PerformaceTestConcurrent {
     
     private static final long loop = 10000000l;
-    private static final int nThreads = 1; 
+    private static final int nThreads = 100000; 
     
     private ExecutorService executor = Executors.newFixedThreadPool(nThreads);
     
@@ -31,14 +31,18 @@ public class PerformaceTestConcurrent {
     private DisruptorEventPublisher<Object> disPublisher;
     private ArrayBlockingQueueEventPublisher<Object> arrayPublisher;
     
+    //buffer size must be a power of 2 
+    private int disruptorBufferSize = 8192;
+    private int blockingQueueCapacity = 1024;
+    
     @Before
     public void init() {
         tracer.start();
         
-        disPublisher = new DisruptorEventPublisher<Object>(8192, handler);
+        disPublisher = new DisruptorEventPublisher<Object>(disruptorBufferSize, handler);
         disPublisher.start();
         
-        arrayPublisher = new ArrayBlockingQueueEventPublisher<Object>(1024000, handler);
+        arrayPublisher = new ArrayBlockingQueueEventPublisher<Object>(blockingQueueCapacity, handler);
         arrayPublisher.start();
     }
     
