@@ -1,5 +1,7 @@
 package com.disruptor.learning.performance;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -19,8 +21,8 @@ import com.disruptor.learning.handler.TestHandler;
 
 public class PerformaceTestConcurrent {
     
-    private static final long loop = 10000000l;
-    private static final int nThreads = 100000; 
+    private static final long loop = 1000l*1000l;
+    private static final int nThreads = 1;
     
     private ExecutorService executor = Executors.newFixedThreadPool(nThreads);
     
@@ -32,8 +34,8 @@ public class PerformaceTestConcurrent {
     private ArrayBlockingQueueEventPublisher<Object> arrayPublisher;
     
     //buffer size must be a power of 2 
-    private int disruptorBufferSize = 8192;
-    private int blockingQueueCapacity = 1024;
+    private int disruptorBufferSize = 1048576;
+    private int blockingQueueCapacity = 1048576;
     
     @Before
     public void init() {
@@ -48,17 +50,27 @@ public class PerformaceTestConcurrent {
     
     @Test
     public void test_Disruptor_multiple_thread() throws InterruptedException, ExecutionException {
-        DisruptorTask task = new DisruptorTask(tracer, disPublisher, loop);
-        Future<Long> result = executor.submit(task);
-        System.out.println(result.get() + "ms");
+        List<DisruptorTask> tasks = new ArrayList<DisruptorTask>();
+        for(int i=1; i<=1000; i++) {
+            DisruptorTask task = new DisruptorTask(tracer, disPublisher, loop);
+            tasks.add(task);
+        }
+        long start = System.currentTimeMillis();
+        executor.invokeAll(tasks);
+        System.out.println((System.currentTimeMillis() - start) + "ms");
         latch.await();
     }
     
     @Test
     public void test_ArrayBlockingQueue_multiple_thread() throws InterruptedException, ExecutionException {
-        ArrayBlockingQueueTask task = new ArrayBlockingQueueTask(tracer, arrayPublisher, loop);
-        Future<Long> result = executor.submit(task);
-        System.out.println(result.get() + "ms");
+        List<ArrayBlockingQueueTask> tasks = new ArrayList<ArrayBlockingQueueTask>();
+        for(int i=1; i<=1000; i++) {
+            ArrayBlockingQueueTask task = new ArrayBlockingQueueTask(tracer, arrayPublisher, loop);
+            tasks.add(task);
+        }
+        long start = System.currentTimeMillis();
+        executor.invokeAll(tasks);
+        System.out.println((System.currentTimeMillis() - start) + "ms");
         latch.await();
     }
     

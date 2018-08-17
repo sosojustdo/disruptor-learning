@@ -24,7 +24,7 @@ public class ArrayBlockingQueueEventPublisher<T> implements EventPublisher<T> {
 
     @Override
     public void start() {
-        System.out.println("ArrayBlockingQueue");
+        //System.out.println("ArrayBlockingQueue");
         Thread thrd = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -40,7 +40,8 @@ public class ArrayBlockingQueueEventPublisher<T> implements EventPublisher<T> {
             while (true) {
                 evt = queue.take();
                 if (evt != null && handler.process(evt)) {
-                    // 完成后自动结束处理线程；
+                    // 完成后自动结束处理线程;
+                    System.out.println("ArrayBlockingQueue task finished...");
                     break;
                 }
             }
