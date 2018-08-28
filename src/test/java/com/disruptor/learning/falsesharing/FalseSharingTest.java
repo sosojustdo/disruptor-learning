@@ -64,8 +64,8 @@ public class FalseSharingTest implements Runnable{
         long i = loops + 1;
         while (0 != --i) {
             //longs0[index].value = i;
-            longs1[index].value = i;
-            //longs2[index].value = i;
+            //longs1[index].value = i;
+            longs2[index].value = i;
         }
     }
     
