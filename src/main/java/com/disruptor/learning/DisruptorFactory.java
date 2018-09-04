@@ -23,7 +23,7 @@ public class DisruptorFactory<T> {
 
     private WaitStrategy waitStrategy = new BlockingWaitStrategy();
 
-    private Disruptor<DisruptorEvent<T>> disruptor;
+    private volatile Disruptor<DisruptorEvent<T>> disruptor;
         
     public DisruptorFactory() {
         super();
@@ -83,7 +83,7 @@ public class DisruptorFactory<T> {
     @SuppressWarnings("unchecked")
     public Disruptor<DisruptorEvent<T>> getDisruptorInstance(EventHandler<? super DisruptorEvent<T>>... handlers) {
         if (null == disruptor) {
-            synchronized (this) {
+            synchronized (Disruptor.class) {
                 if(null == disruptor) {
                     disruptor = new Disruptor<DisruptorEvent<T>>(DisruptorEvent::new, bufferSize, new ThreadFactory() {
                         @Override
